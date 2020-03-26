@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="2fa389e4-eb9c-4e9f-b78c-26bbd9dc6aaa" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="ce3c67c9-6765-4d8f-86c3-e8e8f6074e06" >
+		<wsc:connection wsdlLocation="http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso?WSDL" service="CountryInfoService" port="CountryInfoServiceSoap" address="http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso" />
+	</wsc:config>
+	<flow name="Copy_of_assignmentq4Flow" doc:id="d3756e17-6cad-4258-8e0a-2915ffd5a16c" initialState="started" >
+		<http:listener doc:name="Listener" doc:id="6a847dbb-431e-4fac-97a0-f20702e7911d" config-ref="HTTP_Listener_config" path="/cicd" />
+		<wsc:consume doc:name="Consume" doc:id="f3ba5a0d-411e-4691-a890-4738f55118f3" config-ref="Web_Service_Consumer_Config" operation="ListOfCountryNamesGroupedByContinent"/>
+		<ee:transform doc:name="Transform Message" doc:id="69ab1da2-a2c1-4717-b530-c3e11f26b5aa" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="87e82a91-8541-4ca6-85fb-09f20b870094" message="#[payload]" />
+	</flow>
+</mule>
